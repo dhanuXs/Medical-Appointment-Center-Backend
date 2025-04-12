@@ -1,8 +1,6 @@
 package lk.ijse.medical_appointment_bookig_backend.config;
 
-
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,23 +12,23 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
-/**
- * @author udarasan
- * @TimeStamp 2023-07-15 15:00
- * @ProjectDetails invoice_service
- */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtUtil jwtUtil;
+
     @Autowired
     private UserServiceImpl userService;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -40,38 +38,36 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = null;
         String email = null;
 
-
-        if (null != authorization && authorization.startsWith("Bearer ")) {
-
+        if (authorization != null && authorization.startsWith("Bearer ")) {
             token = authorization.substring(7);
             email = jwtUtil.getUsernameFromToken(token);
-            Claims claims=jwtUtil.getUserRoleCodeFromToken(token);
-            httpServletRequest.setAttribute("email", email);
-            httpServletRequest.setAttribute("role", claims.get("role"));
+            Claims claims = jwtUtil.getUserRoleCodeFromToken(token);
+
+            if (claims != null) {
+                String role = claims.get("role", String.class);
+                httpServletRequest.setAttribute("email", email);
+                httpServletRequest.setAttribute("role", role);
+            }
         }
 
-        if (null != email && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails
-                    = userService.loadUserByUsername(email);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userService.loadUserByUsername(email);
 
             if (jwtUtil.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                        = new UsernamePasswordAuthenticationToken(userDetails,
-                        null, userDetails.getAuthorities());
+                String role = (String) httpServletRequest.getAttribute("role");
+                SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
 
-                usernamePasswordAuthenticationToken.setDetails(
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, Collections.singletonList(authority));
+
+                authenticationToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(httpServletRequest)
                 );
 
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-
         }
+
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
-
-    private Claims getClaimsFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token).getBody();
-    }
-
 }
