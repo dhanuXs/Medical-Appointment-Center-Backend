@@ -52,4 +52,32 @@ public class UserController {
                     .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
         }
     }
+
+    @PostMapping(value = "/update")
+    public ResponseEntity<ResponseDTO> updateUser(@RequestBody @Valid UserDTO userDTO) {
+        try {
+            int statusCode = userService.saveUser(userDTO);
+            switch (statusCode) {
+                case VarList.Created -> {
+                    return ResponseEntity.status(HttpStatus.CREATED)
+                            .body(new ResponseDTO(VarList.Created, "Success", null));
+                }
+                case VarList.Not_Acceptable -> {
+                    return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                            .body(new ResponseDTO(VarList.Not_Acceptable, "Email Already Used", null));
+                }
+                default -> {
+                    return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                            .body(new ResponseDTO(VarList.Bad_Gateway, "Error", null));
+                }
+            }
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
+
+    public ResponseEntity<ResponseDTO> deleteUser(@RequestBody @Valid UserDTO userDTO) {
+        userService.deleteUser(userDTO.getEmail());
+    }
 }
