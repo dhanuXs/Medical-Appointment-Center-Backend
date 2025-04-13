@@ -9,11 +9,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserDTO {
-    private String email;
-    private String name;
-    private String password;
-    private String contactNumber;
-    private String imgUrl;
-    private String role;
+public class AppointmentDTO {
+    private UUID id;
+    private String details;  // Customize fields as per the Appointment entity
+    private String date;
 }

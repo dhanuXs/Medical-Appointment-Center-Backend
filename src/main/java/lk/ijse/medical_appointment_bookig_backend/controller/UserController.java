@@ -1,18 +1,20 @@
 package lk.ijse.medical_appointment_bookig_backend.controller;
 
 import jakarta.validation.Valid;
+import lk.ijse.medical_appointment_bookig_backend.advicer.GlobalExceptionHandler;
 import lk.ijse.medical_appointment_bookig_backend.dto.AuthDTO;
 import lk.ijse.medical_appointment_bookig_backend.dto.ResponseDTO;
 import lk.ijse.medical_appointment_bookig_backend.dto.UserDTO;
 import lk.ijse.medical_appointment_bookig_backend.service.UserService;
 import lk.ijse.medical_appointment_bookig_backend.util.JwtUtil;
 import lk.ijse.medical_appointment_bookig_backend.util.VarList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/user")
@@ -54,13 +56,16 @@ public class UserController {
     }
 
     @PostMapping(value = "/update")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','USER')"
+    )
     public ResponseEntity<ResponseDTO> updateUser(@RequestBody @Valid UserDTO userDTO) {
         try {
-            int statusCode = userService.saveUser(userDTO);
+            int statusCode = userService.updateUser(userDTO);
             switch (statusCode) {
-                case VarList.Created -> {
-                    return ResponseEntity.status(HttpStatus.CREATED)
-                            .body(new ResponseDTO(VarList.Created, "Success", null));
+                case VarList.OK -> {
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseDTO(VarList.OK, "Success", userDTO));
                 }
                 case VarList.Not_Acceptable -> {
                     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
@@ -77,7 +82,52 @@ public class UserController {
         }
     }
 
+    @PostMapping(value = "/delete")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN')"
+    )
     public ResponseEntity<ResponseDTO> deleteUser(@RequestBody @Valid UserDTO userDTO) {
-        userService.deleteUser(userDTO.getEmail());
+        try {
+            int statusCode = userService.deleteUser(userDTO);
+            switch (statusCode) {
+                case VarList.OK -> {
+                    return ResponseEntity.status(HttpStatus.OK)
+                            .body(new ResponseDTO(VarList.OK, "Success", userDTO));
+                }
+                case VarList.Not_Found -> {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new ResponseDTO(VarList.Not_Found, "User Not Found", null));
+                }
+                default -> {
+                    return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                            .body(new ResponseDTO(VarList.Bad_Gateway, "Error", null));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
+
+    @GetMapping(value = "/getAll")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','USER')"
+    )
+    public ResponseEntity<ResponseDTO> getUsers() {
+        try {
+            List<UserDTO> users = userService.getUsers();
+            if (users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseDTO(VarList.Not_Found, "No Users Found", null));
+            }
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseDTO(VarList.OK, "Success", users));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+
     }
 }

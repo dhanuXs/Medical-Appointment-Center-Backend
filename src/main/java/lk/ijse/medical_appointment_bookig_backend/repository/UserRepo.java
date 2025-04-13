@@ -7,5 +7,5 @@ public interface UserRepo extends JpaRepository<User,String> {
 
     boolean existsByEmail(String userName);
 
-    int deleteByEmail(String userName);
+    int removeUserByEmail(String email);
 }

@@ -1,11 +1,13 @@
 package lk.ijse.medical_appointment_bookig_backend.service.impl;
 
+import lk.ijse.medical_appointment_bookig_backend.advicer.GlobalExceptionHandler;
 import lk.ijse.medical_appointment_bookig_backend.dto.UserDTO;
 import lk.ijse.medical_appointment_bookig_backend.entity.User;
 import lk.ijse.medical_appointment_bookig_backend.repository.UserRepo;
 import lk.ijse.medical_appointment_bookig_backend.service.UserService;
 import lk.ijse.medical_appointment_bookig_backend.util.VarList;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -24,6 +27,9 @@ public class UserServiceImpl implements UserDetailsService,UserService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private GlobalExceptionHandler globalExceptionHandler;
 
     @Override
     public int saveUser(UserDTO userDTO) {
@@ -48,12 +54,38 @@ public class UserServiceImpl implements UserDetailsService,UserService {
     }
 
     @Override
-    public int deleteUser(String email) {
-        if (userRepository.existsByEmail(email)) {
-           userRepository.deleteByEmail(email);
+    public int deleteUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+           userRepository.delete(modelMapper.map(userDTO, User.class));
            return VarList.OK;
         }
         return VarList.Not_Found;
+    }
+
+    @Override
+    public int updateUser(UserDTO userDTO) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            User user = userRepository.findByEmail(userDTO.getEmail());
+            if (user != null) {
+                user.setEmail(userDTO.getEmail());
+                user.setPassword(userDTO.getPassword());
+                user.setName(userDTO.getName());
+                user.setRole(userDTO.getRole());
+                user.setImgUrl(userDTO.getImgUrl());
+                userRepository.save(user);
+                return VarList.OK;
+            } else {
+                return VarList.Not_Found;
+            }
+        }
+        return VarList.Not_Found;
+    }
+
+    @Override
+    public List<UserDTO> getUsers() {
+        List<User> users = userRepository.findAll();
+        return modelMapper.map(users,
+                new TypeToken<List<UserDTO>>(){}.getType());
     }
 
     @Override
