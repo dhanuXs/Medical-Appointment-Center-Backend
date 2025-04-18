@@ -27,11 +27,11 @@ public class Attendance {
 
     @Column(nullable = false ,name = "in_time")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date intime; // Check-in time
+    private Date inTime; // Check-in time
 
     @Column(name = "out_time")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date outtime; // Check-out time
+    private Date outTime; // Check-out time
 
     @Column(nullable = false)
     private boolean present; // Whether the doctor was present or not

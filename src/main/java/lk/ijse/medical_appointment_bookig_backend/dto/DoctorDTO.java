@@ -5,17 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class UserDTO {
+public class DoctorDTO {
+    private String name;
+    private String specialization;
+    private String contactNumber;
     @Email
     private String email;
-    private String name;
-    private String password;
-    private String contactNumber;
     private String imgUrl;
-    private String role;
 }

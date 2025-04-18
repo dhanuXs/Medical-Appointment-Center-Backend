@@ -8,7 +8,6 @@ import lk.ijse.medical_appointment_bookig_backend.dto.UserDTO;
 import lk.ijse.medical_appointment_bookig_backend.service.UserService;
 import lk.ijse.medical_appointment_bookig_backend.util.JwtUtil;
 import lk.ijse.medical_appointment_bookig_backend.util.VarList;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +21,6 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    //constructor injection
     public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
