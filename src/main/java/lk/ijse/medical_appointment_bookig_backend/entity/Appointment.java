@@ -7,9 +7,6 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "appointments")
 public class Appointment {
     @Id
@@ -46,10 +43,115 @@ public class Appointment {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id", nullable = false)
+    @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;
+
+    public Appointment() {
+    }
+
+    public Appointment(UUID id, Patient patient, Date appointmentDate, Date appointmentTime, String token, String status, String notes, Cancellation cancellation, User user, Schedule schedule, Payment payment) {
+        this.id = id;
+        this.patient = patient;
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+        this.token = token;
+        this.status = status;
+        this.notes = notes;
+        this.cancellation = cancellation;
+        this.user = user;
+        this.schedule = schedule;
+        this.payment = payment;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public Date getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(Date appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    public Date getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public void setAppointmentTime(Date appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Cancellation getCancellation() {
+        return cancellation;
+    }
+
+    public void setCancellation(Cancellation cancellation) {
+        this.cancellation = cancellation;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
 }

@@ -5,9 +5,6 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "feedback")
 public class Feedback {
     @Id
@@ -23,4 +20,46 @@ public class Feedback {
 
     @Column(nullable = false)
     private double rating; // 1-5 scale rating
+
+    public Feedback() {
+    }
+
+    public Feedback(UUID id, User user, String feedbackMessage, double rating) {
+        this.id = id;
+        this.user = user;
+        this.feedbackMessage = feedbackMessage;
+        this.rating = rating;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getFeedbackMessage() {
+        return feedbackMessage;
+    }
+
+    public void setFeedbackMessage(String feedbackMessage) {
+        this.feedbackMessage = feedbackMessage;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
 }

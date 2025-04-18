@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "schedule")
 public class Schedule {
     @Id
@@ -37,4 +34,5 @@ public class Schedule {
 
     @OneToMany(mappedBy = "schedule",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Appointment> appointments;
+
 }
