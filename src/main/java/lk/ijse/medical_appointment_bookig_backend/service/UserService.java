@@ -14,4 +14,6 @@ public interface UserService {
     int updateUser(UserDTO userDTO);
 
     List<UserDTO> getUsers();
+
+    UserDTO getUser(String email);
 }

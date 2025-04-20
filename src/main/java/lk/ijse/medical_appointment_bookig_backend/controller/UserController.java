@@ -128,4 +128,22 @@ public class UserController {
         }
 
     }
+    @GetMapping(value = "/getUser/{email}")
+    public ResponseEntity<ResponseDTO> getUser (@PathVariable String email){
+        System.out.println(email);
+        try{
+            UserDTO user = userService.getUser(email);
+            if (user != null){
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseDTO(VarList.OK, "Success", user));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseDTO(VarList.Not_Found, "No Users Found", null));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDTO(VarList.Internal_Server_Error, e.getMessage(), null));
+        }
+    }
 }

@@ -89,6 +89,12 @@ public class UserServiceImpl implements UserDetailsService,UserService {
     }
 
     @Override
+    public UserDTO getUser(String email) {
+        User userByEmail = userRepository.getUserByEmail(email);
+        return modelMapper.map(userByEmail,new TypeToken<UserDTO>(){}.getType());
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), getAuthority(user));
