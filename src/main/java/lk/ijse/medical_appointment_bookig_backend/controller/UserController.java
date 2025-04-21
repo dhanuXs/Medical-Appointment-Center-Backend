@@ -109,9 +109,6 @@ public class UserController {
     }
 
     @GetMapping(value = "/getAll")
-    @PreAuthorize(
-            "hasAnyRole('ADMIN','USER')"
-    )
     public ResponseEntity<ResponseDTO> getUsers() {
         try {
             List<UserDTO> users = userService.getUsers();
